@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+
+body{
+  font-family: "Open Sans", sans-serif;
+}
+
+
+/* Contenedor principal con altura fija */
+.main-container {
+  max-width: 1200px; 
+  height: 700px; 
+}
+
+/* Imagen de fondo con degradado */
+.background-image {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.8)), 
+              url('https://escuelafarmacia.com/wp-content/uploads/cl%C3%ADnica-veterinaria.jpg') no-repeat center center/cover;
+  height: 100%; 
+}
+
+
+.text-small{
+  font-size: 15px;
+  color: #737171;
+  font-weight:500; 
+}
+
+
+/* alerta  */
+.alert-danger {
+  background-color: #d9534f; 
+  border-color: #d43f00; 
+  opacity: 1 !important;
+}
