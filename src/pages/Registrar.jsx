@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Alerta } from "../components/Alerta";
-import axios from 'axios';
+import clienteAxios from "../../config/axios";
+
 
 export const Registrar = () => {
     // Estado para los campos
@@ -50,13 +51,11 @@ export const Registrar = () => {
         // Crear usuario en la api
         try {
 
-            // URL de la API
-            const url = 'http://localhost:4000/api/veterinarios';
             // Datos del veterinario
             const veterinario = { nombre, email, password };
 
             // Realizar la solicitud POST
-            await axios.post(url, veterinario, {
+            await clienteAxios.post('/veterinarios', veterinario, {
                 headers: { 'Content-Type': 'application/json' }
             });
             setAlerta({
