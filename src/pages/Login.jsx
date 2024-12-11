@@ -1,7 +1,68 @@
-import { Link } from "react-router-dom"
+import { useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import { Alerta } from '../components/Alerta';
+import clienteAxios from "../../config/axios";
 
 export const Login = () => {
+
+    // mis estados 
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [alerta, setAlerta] = useState({});
+
+
+
+    // Funcion navegar al usuario 
+    const navigate = useNavigate();
+
+    console.log('NAVEGACIO', navigate);
+
+
+
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        //validar
+        if ([email, password].includes('')) {
+            setAlerta({
+                message: 'Todos los campos son obligatorio',
+                error: true
+            });
+            //para que no ejecute las siguientes lineas
+            return;
+        }
+
+        //peticion a la url
+        try {
+            const { data } = await clienteAxios.post('/veterinarios/login', { email, password });
+
+            // guardar el token 
+            localStorage.setItem('token', data.token);
+
+            //si los datos estan ok, navegar
+            navigate('/admin')
+
+        } catch (error) {
+            setAlerta({
+                message: error.response.data.msg,
+                error: true
+            })
+
+            console.log(error)
+        }
+
+
+    }
+
+
+
+
+
+    const { message } = alerta;
+
     return (
+
         <>
             <main className="d-flex align-items-center justify-content-center vh-100">
                 <div className="main-container row w-100 mx-auto shadow-lg rounded overflow-hidden">
@@ -13,16 +74,37 @@ export const Login = () => {
 
                     {/* Formulario  */}
                     <div className="col-12 col-lg-6 bg-light d-flex flex-column justify-content-center align-items-center p-4">
-                        <form className="w-75 ">
+
+                        {/* si existe mensaje  */}
+                        {message && <Alerta alerta={alerta} />}
+
+
+                        <form
+                            onSubmit={handleSubmit}
+                            className="w-100"
+                        >
                             {/* Email */}
                             <div className="mb-3">
                                 <label htmlFor="email" className="form-label fw-bold">Dirección de email</label>
-                                <input type="email" className="form-control" id="email" placeholder="Ingresa Email" />
+                                <input type="email"
+                                    className="form-control"
+                                    id="email"
+                                    placeholder="Ingresa Email"
+                                    value={email}
+                                    onChange={e => setEmail(e.target.value)}
+                                />
                             </div>
                             {/* Contraseña */}
                             <div className="mb-3">
                                 <label htmlFor="password" className="form-label fw-bold">Contraseña</label>
-                                <input type="password" className="form-control" id="password" placeholder="Ingresa Contraseña" />
+                                <input
+                                    type="password"
+                                    className="form-control"
+                                    id="password"
+                                    placeholder="Ingresa Contraseña"
+                                    value={password}
+                                    onChange={e => setPassword(e.target.value)}
+                                />
                             </div>
 
                             <button type="submit" className="btn btn-primary w-100">Enviar</button>
