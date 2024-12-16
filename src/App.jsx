@@ -7,6 +7,7 @@ import { ConfirmarCuenta } from './pages/ConfirmarCuenta';
 import { NuevoPassword } from './pages/NuevoPassword';
 import { AuthProvider } from './context/AuthProvider';
 import { RutaProtegida } from './layout/RutaProtegida';
+import { AdministrarPacientes } from './pages/AdministrarPacientes';
 
 
 function App() {
@@ -17,7 +18,7 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          {/* Rutas principal  */}
+          {/* Rutas publicas  */}
           <Route path='/' element={<AuthLayout />}>
             <Route index element={<Login />} />
             <Route path='registrar' element={<Registrar />} />
@@ -28,7 +29,7 @@ function App() {
 
           {/* Rutas privadas  */}
           <Route path='/admin' element={<RutaProtegida />}>
-
+            <Route index element={<AdministrarPacientes />} />
           </Route>
         </Routes>
       </AuthProvider>

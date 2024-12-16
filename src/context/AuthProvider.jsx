@@ -11,6 +11,7 @@ const AuthContext = createContext();
 const AuthProvider = ({ children }) => {
 
     //Defino mis estados, estaran disponible en cualquier componente
+    const [cargando, setCargando] = useState(true);
     const [auth, setAuth] = useState({});
 
 
@@ -20,8 +21,10 @@ const AuthProvider = ({ children }) => {
     useEffect(() => {
         const autenticarUsuario = async () => {
             const token = localStorage.getItem('token');
+
             if (!token) {
                 console.log('No hay token disponible');
+                setCargando(false);
                 return;
             }
 
@@ -45,11 +48,18 @@ const AuthProvider = ({ children }) => {
                 // si en caso de error se crea un objeto vacio, y no este atenticado el usuario
                 setAuth({});
             }
+
+            setCargando(false);
         };
 
         autenticarUsuario();
     }, []);
 
+    // Cerrar cesion 
+    const cerrarSesion = () => {
+        localStorage.removeItem('token');
+        setAuth({});
+    }
 
 
     return (
@@ -58,7 +68,9 @@ const AuthProvider = ({ children }) => {
             // retorna un objeto, que pone disponible puede ser cualquier valor
             value={{
                 auth,
-                setAuth
+                setAuth,
+                cargando,
+                cerrarSesion
             }}
 
         >
