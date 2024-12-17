@@ -30,7 +30,7 @@ export const AdministrarPacientes = () => {
                 </div>
 
                 {/* Listado de pacientes */}
-                <div className="col-12 col-lg-7 border">
+                <div className="col-12 col-lg-7">
                     <ListadoPacientes />
                 </div>
             </div>

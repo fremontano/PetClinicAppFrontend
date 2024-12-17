@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Alerta } from '../components/Alerta';
+import usePacientes from "../hooks/usePacientes";
 
 export const Formulario = () => {
 
@@ -7,12 +8,15 @@ export const Formulario = () => {
     const [nombre, setNombre] = useState('');
     const [propietario, setPropietario] = useState('');
     const [email, setEmail] = useState('');
-    const [fechaAlta, setFechaAlta] = useState(Date.now());
+    const [fechaAlta, setFechaAlta] = useState('');
     const [sintomas, setSintomas] = useState('');
 
 
     // Estado para la alerta
     const [alerta, setAlerta] = useState({});
+
+    //provider retorna un objeto
+    const { pacientes, guardarPacientes } = usePacientes();
 
 
 
@@ -32,6 +36,18 @@ export const Formulario = () => {
         }
 
 
+        // Guardar a travez de un objeto los datos  
+        guardarPacientes({ nombre, propietario, email, fechaAlta, sintomas });
+
+        setAlerta({});
+        // Limpiar formulario
+        setNombre('');
+        setPropietario('');
+        setEmail('');
+        setFechaAlta(Date.now());
+        setSintomas('');
+
+
     };
 
 
@@ -41,7 +57,8 @@ export const Formulario = () => {
 
     return (
         <div className="bg-white p-4 shadow mb-3 rounded">
-            <p className="fw-bold text-center my-5">
+            <h2 className="fw-bolder  text-primary text-center ">Administrador de  Pacientes </h2>
+            <p className="fw-bold text-center my-3">
                 Añade tus pacientes y{' '}
                 <span className="text-primary">Administralos</span>
             </p>
@@ -51,6 +68,7 @@ export const Formulario = () => {
 
             <form
                 onSubmit={handleSubmit}
+                className="mt-2  p-2"
             >
                 {/* Nombre de la Mascota */}
                 <div className="mb-3">
