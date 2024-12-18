@@ -1,10 +1,14 @@
 
 import PropTypes from 'prop-types';
+import usePacientes from '../hooks/usePacientes';
 
 //  componente paciente para mostrar en la lista
 export const Paciente = ({ paciente }) => {
 
-    const { nombre, propietario, email, sintomas, fechaDeAlta } = paciente;
+    const { setEditar, eliminarPaciente } = usePacientes();
+
+
+    const { _id, nombre, propietario, email, sintomas, fechaDeAlta } = paciente;
 
 
     // formatear fecha para mostrar al usuario, no muta el objeto
@@ -16,7 +20,6 @@ export const Paciente = ({ paciente }) => {
         }
         return new Intl.DateTimeFormat('es-CL', { dateStyle: 'long' }).format(nuevaFecha);
     }
-
 
 
     return (
@@ -46,25 +49,29 @@ export const Paciente = ({ paciente }) => {
                 <button
                     type="button"
                     className="btn btn-primary py-1 px-3  text-white text-uppercase fw-bold text-small"
+                    onClick={() => setEditar(paciente)}
+
                 >
                     Editar
                 </button>
 
                 <button
                     type="button"
-                    className="btn btn-danger py-1 px-3  text-white text-uppercase fw-bold text-small"
+                    className="btn btn-danger py-1 px-3 text-white text-uppercase fw-bold text-small"
+                    onClick={() => eliminarPaciente(_id)}
                 >
                     Eliminar
                 </button>
+
             </div>
-        </div>
+        </div >
     )
 }
 
 // Agregar validación de los props
 Paciente.propTypes = {
     paciente: PropTypes.shape({
-
+        _id: PropTypes.string.isRequired,
         nombre: PropTypes.string.isRequired,
         propietario: PropTypes.string.isRequired,
         email: PropTypes.string.isRequired,

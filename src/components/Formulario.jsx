@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alerta } from '../components/Alerta';
 import usePacientes from "../hooks/usePacientes";
 
@@ -10,14 +10,29 @@ export const Formulario = () => {
     const [email, setEmail] = useState('');
     const [fechaAlta, setFechaAlta] = useState('');
     const [sintomas, setSintomas] = useState('');
+    const [id, setId] = useState(null);
 
 
     // Estado para la alerta
     const [alerta, setAlerta] = useState({});
 
     //provider retorna un objeto
-    const { pacientes, guardarPacientes } = usePacientes();
+    const { objPaciente, guardarPacientes } = usePacientes();
 
+
+
+    //Cargar informacion del paciente, para editar
+    useEffect(() => {
+        if (objPaciente?.nombre) {
+            setNombre(objPaciente.nombre);
+            setPropietario(objPaciente.propietario);
+            setEmail(objPaciente.email);
+            setFechaAlta(objPaciente.fechaAlta);
+            setSintomas(objPaciente.sintomas);
+            setId(objPaciente._id);
+        }
+        console.log('Render o cambio paciente', objPaciente);
+    }, [objPaciente]);
 
 
 
@@ -37,17 +52,24 @@ export const Formulario = () => {
 
 
         // Guardar a travez de un objeto los datos  
-        guardarPacientes({ nombre, propietario, email, fechaAlta, sintomas });
+        guardarPacientes({ nombre, propietario, email, fechaAlta, sintomas, id });
+        setAlerta({
+            message: 'Guardado exitosamente',
+        });
 
-        setAlerta({});
+        // Mantener la alerta visible por un tiempo
+        setTimeout(() => {
+            setAlerta({});
+        }, 2500);
+
+
         // Limpiar formulario
         setNombre('');
         setPropietario('');
         setEmail('');
         setFechaAlta(Date.now());
         setSintomas('');
-
-
+        setId(null);
     };
 
 
@@ -136,9 +158,10 @@ export const Formulario = () => {
                 {/* Boton de Enviar */}
                 <div className="text-center d-grid">
                     <input
-                        value='Agregar paciente'
+                        value={id ? 'Guardar Cambios' : 'Agregar paciente'}
                         className="text-white btn btn-primary"
                         type="submit" />
+
                 </div>
             </form>
         </div>
