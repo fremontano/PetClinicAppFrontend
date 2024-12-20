@@ -1,20 +1,15 @@
+import { Link } from "react-router-dom"; // Importa desde react-router-dom
 import useAuth from "../hooks/useAuth";
 
 export const Header = () => {
-
-
-
-
     const { cerrarSesion } = useAuth();
-
-
 
     return (
         <header className="header">
             <nav className="navbar navbar-expand-lg custom-navbar">
                 <div className="container-fluid d-flex justify-content-between align-items-center">
                     {/* Logo */}
-                    <a className="navbar-brand text-center text-white fw-bold " href="#">
+                    <a className="navbar-brand text-center text-white fw-bold" href="#">
                         Administrador de Pacientes de <span>Veterinaria</span>
                     </a>
 
@@ -38,13 +33,13 @@ export const Header = () => {
                                 <a className="nav-link text-center text-white" href="#">Paciente</a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link text-center text-white" href="#">Perfil</a>
+                                <Link to='/admin/perfil/' className="nav-link text-center text-white">Perfil</Link>
                             </li>
                             <li className="nav-item">
                                 <button
                                     className="btn btn-link text-center text-white fw-bold"
                                     onClick={cerrarSesion}>
-                                    Cerrar Sección
+                                    Cerrar Sesión
                                 </button>
                             </li>
                         </ul>

@@ -126,8 +126,8 @@ const PacientesProvider = ({ children }) => {
 
 
     // Eliminar paciente
-    const handleEliminarPaciente = async (id) => {
-        // Mostrar alerta de confirmación antes de eliminar
+    const handleEliminarPaciente = async id => {
+        // Mostrar alerta de confirmacion antes de eliminar
         const result = await Swal.fire({
             title: '¿Estás seguro?',
             text: '¡No podrás revertir esta acción!',
@@ -142,8 +142,9 @@ const PacientesProvider = ({ children }) => {
             }
         });
 
-        // Si el usuario confirma la eliminación
+        // Si el usuario confirma la eliminacion
         if (result.isConfirmed) {
+
             try {
                 const token = localStorage.getItem('token');
                 if (!token) return;
@@ -155,14 +156,14 @@ const PacientesProvider = ({ children }) => {
                     },
                 };
 
-                // Realizar la eliminación en la API
+                // Realizar la eliminacion en la API
                 const { data } = await clienteAxios.delete(`/pacientes/${id}`, config);
 
                 // Filtrar el paciente eliminado de la lista
                 const pacienteEliminar = pacientes.filter(prevPaciente => prevPaciente._id !== id);
                 setPacientes(pacienteEliminar);
 
-                // Mostrar alerta de éxito
+                // Mostrar alerta de exito
                 Swal.fire({
                     title: '¡Eliminado!',
                     text: 'El paciente ha sido eliminado exitosamente.',
@@ -177,7 +178,7 @@ const PacientesProvider = ({ children }) => {
             } catch (error) {
                 console.log(error);
 
-                // Mostrar alerta de error si ocurre algún problema
+                // Mostrar alerta de error si ocurre algun problema
                 Swal.fire({
                     title: 'Error',
                     text: 'No se pudo eliminar el paciente. Inténtalo de nuevo.',
@@ -186,7 +187,7 @@ const PacientesProvider = ({ children }) => {
                 });
             }
         } else if (result.dismiss === Swal.DismissReason.cancel) {
-            // Si el usuario cancela, muestra mensaje de cancelación
+            // Si el usuario cancela, muestra mensaje de cancelacion
             Swal.fire({
                 title: 'Cancelado',
                 text: 'El paciente no fue eliminado.',
@@ -197,14 +198,13 @@ const PacientesProvider = ({ children }) => {
     };
 
 
-
     return (
         <PacientesContext.Provider value={{
             pacientes,
             pacienteObj,
             handleGuardaPaciente,
             handleEditarPaciente,
-            handleEliminarPaciente
+            handleEliminarPaciente,
         }}>
             {children}
         </PacientesContext.Provider>

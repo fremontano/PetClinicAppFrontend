@@ -61,6 +61,11 @@ const AuthProvider = ({ children }) => {
         setAuth({});
     }
 
+    //Actualizar Perfil
+    const handleActualizarPerfil = () => {
+        console.log('datos')
+    }
+
 
     return (
         <AuthContext.Provider
@@ -70,7 +75,8 @@ const AuthProvider = ({ children }) => {
                 auth,
                 setAuth,
                 cargando,
-                cerrarSesion
+                cerrarSesion,
+                handleActualizarPerfil
             }}
 
         >
