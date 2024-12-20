@@ -4,93 +4,89 @@ import usePacientes from "../hooks/usePacientes";
 
 export const Formulario = () => {
 
-    // Estado para el formulario
+    // Estado del formulario
     const [nombre, setNombre] = useState('');
     const [propietario, setPropietario] = useState('');
     const [email, setEmail] = useState('');
     const [fechaAlta, setFechaAlta] = useState('');
     const [sintomas, setSintomas] = useState('');
-    const [id, setId] = useState(null);
+    const [id, setid] = useState(null);
 
-
-    // Estado para la alerta
+    // mensaje alerta 
     const [alerta, setAlerta] = useState({});
 
     //provider retorna un objeto
-    const { objPaciente, guardarPacientes } = usePacientes();
+    const { pacienteObj, handleGuardaPaciente } = usePacientes();
 
 
 
-    //Cargar informacion del paciente, para editar
     useEffect(() => {
-        if (objPaciente?.nombre) {
-            setNombre(objPaciente.nombre);
-            setPropietario(objPaciente.propietario);
-            setEmail(objPaciente.email);
-            setFechaAlta(objPaciente.fechaAlta);
-            setSintomas(objPaciente.sintomas);
-            setId(objPaciente._id);
+
+        if (pacienteObj?.nombre) {
+            setNombre(pacienteObj.nombre);
+            setPropietario(pacienteObj.propietario);
+            setEmail(pacienteObj.email);
+            setFechaAlta(pacienteObj.fechaAlta);
+            setSintomas(pacienteObj.sintomas);
+            setid(pacienteObj._id);
         }
-        console.log('Render o cambio paciente', objPaciente);
-    }, [objPaciente]);
+
+    }, [pacienteObj]);
 
 
 
-
-    // Manejo del envío del formulario
-    const handleSubmit = (e) => {
+    // validar formulario 
+    const handleSubmit = e => {
         e.preventDefault();
 
-        // Validar formulario
         if ([nombre, propietario, email, fechaAlta, sintomas].includes('')) {
             setAlerta({
                 message: 'Todos los campos son obligatorios',
                 error: true
             });
+
+            setTimeout(() => {
+                setAlerta({});
+            }, 2500);
             return;
         }
 
 
-        // Guardar a travez de un objeto los datos  
-        guardarPacientes({ nombre, propietario, email, fechaAlta, sintomas, id });
-        setAlerta({
-            message: 'Guardado exitosamente',
-        });
-
-        // Mantener la alerta visible por un tiempo
-        setTimeout(() => {
-            setAlerta({});
-        }, 2500);
-
+        handleGuardaPaciente({ nombre, propietario, email, fechaAlta, sintomas, id });
 
         // Limpiar formulario
         setNombre('');
         setPropietario('');
         setEmail('');
-        setFechaAlta(Date.now());
+        setFechaAlta('');
         setSintomas('');
-        setId(null);
-    };
+        setid(null);
+    }
+
+
+
+
+
+
 
 
     // extraer 
     const { message } = alerta;
 
 
+
     return (
-        <div className="bg-white p-4 shadow mb-3 rounded">
-            <h2 className="fw-bolder  text-primary text-center ">Administrador de  Pacientes </h2>
-            <p className="fw-bold text-center my-3">
-                Añade tus pacientes y{' '}
-                <span className="text-primary">Administralos</span>
-            </p>
+        <>
+
 
             {/* mostrar alerta  */}
             {message && <Alerta alerta={alerta} />}
 
+
             <form
                 onSubmit={handleSubmit}
-                className="mt-2  p-2"
+
+                className="mt-2  p-3 bg-body rounded"
             >
                 {/* Nombre de la Mascota */}
                 <div className="mb-3">
@@ -102,6 +98,7 @@ export const Formulario = () => {
                         className="form-control w-100 p-2 mt-2 bg-light"
                         value={nombre}
                         onChange={e => setNombre(e.target.value)}
+
                     />
                 </div>
 
@@ -115,6 +112,7 @@ export const Formulario = () => {
                         className="form-control w-100 p-2 mt-2 bg-light"
                         value={propietario}
                         onChange={e => setPropietario(e.target.value)}
+
                     />
                 </div>
 
@@ -128,6 +126,7 @@ export const Formulario = () => {
                         className="form-control w-100 p-2 mt-2 bg-light"
                         value={email}
                         onChange={e => setEmail(e.target.value)}
+
                     />
                 </div>
 
@@ -141,6 +140,7 @@ export const Formulario = () => {
                         className="form-control w-100 p-2 mt-2 bg-light"
                         value={fechaAlta}
                         onChange={e => setFechaAlta(e.target.value)}
+
                     />
                 </div>
                 {/* Sintomas */}
@@ -152,18 +152,20 @@ export const Formulario = () => {
                         className="form-control w-100 p-2 mt-2 bg-light"
                         value={sintomas}
                         onChange={e => setSintomas(e.target.value)}
+
                     />
                 </div>
 
                 {/* Boton de Enviar */}
                 <div className="text-center d-grid">
                     <input
+                        className="btn btn-primary px-2"
                         value={id ? 'Guardar Cambios' : 'Agregar paciente'}
-                        className="text-white btn btn-primary"
-                        type="submit" />
+                        type="submit"
+                    />
 
                 </div>
             </form>
-        </div>
+        </>
     )
 }

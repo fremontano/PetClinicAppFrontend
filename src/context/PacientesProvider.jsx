@@ -1,23 +1,42 @@
-import { createContext, useEffect, useState } from "react";
-import PropTypes from "prop-types"; // Agrega esta línea
-import clienteAxios from "../../config/axios";
-// sweetalert2 
+/* eslint-disable no-unused-vars */
 import Swal from 'sweetalert2';
+import { createContext, useEffect, useState } from "react";
+import clienteAxios from "../../config/axios";
+import PropTypes from "prop-types";
 
+
+// Mensaje de exito 
+const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+    }
+});
 
 const PacientesContext = createContext();
 
 const PacientesProvider = ({ children }) => {
 
+    // Arreglos de pacientes para el formulario
     const [pacientes, setPacientes] = useState([]);
+    // Se crea este objeto paciente vacio para llenar o editar el formulario 
+    const [pacienteObj, setPacienteObj] = useState({});
 
-    // actualizar paciente, mediante un objeto
-    const [objPaciente, setObjPaciente] = useState({});
 
-    //Cuando cargue el componente se va a ejecutar, consulta api y trae los resultados
+
+
+    //Cargar el componente, y trae el resultado desde la api
     useEffect(() => {
+
         const obtenerPacientes = async () => {
+
             try {
+                // consultar la api 
                 const token = localStorage.getItem('token');
                 if (!token) return;
 
@@ -27,21 +46,30 @@ const PacientesProvider = ({ children }) => {
                         Authorization: `Bearer ${token}`,
                     },
                 };
+
                 // Obtener informacion de cliente con axios 
                 const { data } = await clienteAxios.get('/pacientes', config);
                 setPacientes(data);
+                if (Array.isArray(data.pacientes)) setPacientes(data.pacientes);
+
+
             } catch (error) {
                 console.log(error);
             }
-        };
+        }
         obtenerPacientes();
     }, []);
 
-    // insertar en la api 
-    const guardarPacientes = async (paciente) => {
+
+    //Guardar paciente
+    const handleGuardaPaciente = async (paciente) => {
+
         if (paciente.id) {
+
             try {
                 const token = localStorage.getItem('token');
+                if (!token) return;
+
                 const config = {
                     headers: {
                         'Content-Type': 'application/json',
@@ -53,17 +81,18 @@ const PacientesProvider = ({ children }) => {
                 const { data } = await clienteAxios.put(`/pacientes/${paciente.id}`, paciente, config);
 
                 // Sincronizar los datos editados y mostrar en pantalla
-                setPacientes((prevPacientes) =>
-                    prevPacientes.map((pacienteState) =>
-                        pacienteState._id === data._id ? data : pacienteState
-                    )
-                );
+                const pacienteActualizado = pacientes.map(pacienteState => pacienteState._id === data._id ? data : pacienteState);
+                setPacientes(pacienteActualizado);
+
             } catch (error) {
-                console.log(error);
+                console.log(error)
             }
         } else {
+
             try {
                 const token = localStorage.getItem('token');
+                if (!token) return;
+
                 const config = {
                     headers: {
                         'Content-Type': 'application/json',
@@ -71,107 +100,117 @@ const PacientesProvider = ({ children }) => {
                     },
                 };
 
-                // Crear un nuevo paciente
                 const { data } = await clienteAxios.post('/pacientes', paciente, config);
 
-                // Eliminar datos innecesarios
-                const { createdAt, updatedAt, __v, ...pacienteAlmacenado } = data;
+                const { __v, updatedAt, createdAt, ...pacienteAlmacenado } = data.pacienteAlmacenado;
 
-                // Actualizar el estado con el nuevo paciente
-                setPacientes((prevPacientes) => [...prevPacientes, pacienteAlmacenado]);
+
+                setPacientes((prevPacientes) => [pacienteAlmacenado, ...prevPacientes]);
+                // Mostrar el mensaje de éxito
+                Toast.fire({
+                    icon: "success",
+                    title: "Paciente agregado exitosamente"
+                });
+
             } catch (error) {
-                console.log(error.response?.data?.msg || "Error al guardar el paciente");
+                console.log(error);
             }
         }
     };
 
 
-    // Editar paciente, le pasamos el objeto entero
-    const setEditar = (paciente) => {
-        setObjPaciente(paciente);
-    };
+    //Editar pacinte
+    const handleEditarPaciente = (pacienteObj) => {
+        setPacienteObj(pacienteObj);
+    }
 
 
-
-    // eliminar paciente 
-    const eliminarPaciente = async (id) => {
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: "btn btn-success mx-4",
-                cancelButton: "btn btn-danger"
-            },
-            buttonsStyling: false
-        });
-
-        const showAlert = (title, text, icon) => {
-            swalWithBootstrapButtons.fire({
-                title: title,
-                text: text,
-                icon: icon
-            });
-        };
-
-        swalWithBootstrapButtons.fire({
-            title: "¿Estás seguro?",
-            text: "¡No podrás revertir esta acción!",
-            icon: "warning",
+    // Eliminar paciente
+    const handleEliminarPaciente = async (id) => {
+        // Mostrar alerta de confirmación antes de eliminar
+        const result = await Swal.fire({
+            title: '¿Estás seguro?',
+            text: '¡No podrás revertir esta acción!',
+            icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: "Sí, eliminar",
-            cancelButtonText: "No, cancelar",
-            reverseButtons: true
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                try {
-                    // Verificar si existe el token
-                    const token = localStorage.getItem('token');
-                    if (!token) {
-                        return showAlert("Error", "No tienes permiso para eliminar este paciente. Inicia sesión.", "error");
-                    }
-
-                    // Configuracion para la solicitud
-                    const config = {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${token}`,
-                        },
-                    };
-
-                    // Eliminar paciente desde el servidor
-                    const { data } = await clienteAxios.delete(`/pacientes/${id}`, config);
-
-                    // Eliminar paciente del estado local
-                    const pacienteEliminar = pacientes.filter(prevPaciente => prevPaciente._id !== id);
-                    setPacientes(pacienteEliminar);
-
-                    showAlert("¡Eliminado!", "El paciente ha sido eliminado.", "success");
-                } catch (error) {
-                    // Revisar el tipo de error
-                    const errorMessage = error.response ? error.response.data.message : "No se pudo eliminar el paciente.";
-                    showAlert("Error", errorMessage, "error");
-                    console.log(error);
-                }
-            } else if (result.dismiss === Swal.DismissReason.cancel) {
-                showAlert("Cancelado", "El paciente no se ha Eliminado", "error");
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'No, cancelar',
+            reverseButtons: true,
+            customClass: {
+                confirmButton: 'btn btn-danger',
+                cancelButton: 'btn btn-success'
             }
         });
+
+        // Si el usuario confirma la eliminación
+        if (result.isConfirmed) {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+
+                const config = {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                };
+
+                // Realizar la eliminación en la API
+                const { data } = await clienteAxios.delete(`/pacientes/${id}`, config);
+
+                // Filtrar el paciente eliminado de la lista
+                const pacienteEliminar = pacientes.filter(prevPaciente => prevPaciente._id !== id);
+                setPacientes(pacienteEliminar);
+
+                // Mostrar alerta de éxito
+                Swal.fire({
+                    title: '¡Eliminado!',
+                    text: 'El paciente ha sido eliminado exitosamente.',
+                    icon: 'success',
+                    confirmButtonText: 'Aceptar',
+                    customClass: {
+                        confirmButton: 'btn btn-success'
+                    }
+
+                });
+
+            } catch (error) {
+                console.log(error);
+
+                // Mostrar alerta de error si ocurre algún problema
+                Swal.fire({
+                    title: 'Error',
+                    text: 'No se pudo eliminar el paciente. Inténtalo de nuevo.',
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                });
+            }
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+            // Si el usuario cancela, muestra mensaje de cancelación
+            Swal.fire({
+                title: 'Cancelado',
+                text: 'El paciente no fue eliminado.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
+        }
     };
 
 
 
     return (
-        <PacientesContext.Provider
-            value={{
-                pacientes,
-                guardarPacientes,
-                setEditar,
-                objPaciente,
-                eliminarPaciente
-            }}
-        >
+        <PacientesContext.Provider value={{
+            pacientes,
+            pacienteObj,
+            handleGuardaPaciente,
+            handleEditarPaciente,
+            handleEliminarPaciente
+        }}>
             {children}
         </PacientesContext.Provider>
     );
 };
+
 
 PacientesProvider.propTypes = {
     children: PropTypes.node.isRequired,
