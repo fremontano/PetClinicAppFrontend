@@ -2,6 +2,22 @@ import { createContext, useEffect, useState } from 'react';
 import clienteAxios from '../../config/axios';
 import PropTypes from 'prop-types';
 
+
+import Swal from 'sweetalert2';
+
+// Configuracion del Toast
+const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+    }
+});
+
 const AuthContext = createContext();
 
 
@@ -62,8 +78,46 @@ const AuthProvider = ({ children }) => {
     }
 
     //Actualizar Perfil
-    const handleActualizarPerfil = () => {
-        console.log('datos')
+    const handleActualizarPerfil = async (datosPerfil) => {
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            console.log('No hay token disponible');
+            setCargando(false);
+            return;
+        }
+
+        // Leer el token
+        const config = {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        };
+
+        try {
+            const url = `/veterinarios/perfil/${datosPerfil._id}`;
+
+            const { data } = await clienteAxios.put(url, datosPerfil, config);
+
+            Toast.fire({
+                icon: 'success',
+                title: '¡Perfil actualizado con éxito!'
+            });
+
+            return { success: true, data };
+
+        } catch (error) {
+            //  mostrar el mensaje si hay error
+            const errorMsg = error.response?.data?.msg || 'Hubo un error al actualizar el perfil';
+
+            Toast.fire({
+                icon: 'error',
+                title: errorMsg
+            });
+
+            return { success: false, error: errorMsg };
+        }
     }
 
 

@@ -35,12 +35,11 @@ export const EditarPerfil = () => {
 
 
     // Manejar envio del formulario
-    const handleSubmit = (e) => {
+    const handleSubmit = async e => {
         e.preventDefault();
 
         const { nombre, email } = perfil;
 
-        // Validacion de campos requeridos
         if ([nombre, email].includes('')) {
             setAlerta({
                 message: 'Los campos nombre y correo son obligatorios',
@@ -54,24 +53,40 @@ export const EditarPerfil = () => {
             return;
         }
 
-
-        Toast.fire({
-            icon: 'success',
-            title: '¡Perfil actualizado con éxito!'
-        });
+        //   handleActualizarPerfil
+        const { success, error } = await handleActualizarPerfil({ ...perfil, web: perfil.web || '' });
 
 
-        // Limpiar formulario
-        setPerfil({
-            nombre: '',
-            email: '',
-            telefono: '',
-            sitioweb: ''
-        });
+        if (error) {
+            setAlerta({
+                message: error,
+                error: true
+            });
 
-        //Actualizar Perfil
-        handleActualizarPerfil(perfil);
+            setTimeout(() => {
+                setAlerta({});
+            }, 2500);
+
+            return;
+        }
+
+        // Mostrar mensaje, si la actualizacion es exitosa
+        if (success) {
+            Toast.fire({
+                icon: 'success',
+                title: '¡Perfil actualizado con éxito!'
+            });
+
+            // Limpiar formulario
+            setPerfil({
+                nombre: '',
+                email: '',
+                telefono: '',
+                web: ''
+            });
+        }
     };
+
 
 
 
@@ -125,8 +140,8 @@ export const EditarPerfil = () => {
                             <label htmlFor="sitioWeb" className="form-label fw-bold text-dark">Sitio Web</label>
                             <input
                                 type="text"
-                                name="sitioweb"
-                                value={perfil.sitioweb || ''}
+                                name="web"
+                                value={perfil.web || ''}
                                 onChange={e => setPerfil({ ...perfil, [e.target.name]: e.target.value })}
                                 className="form-control w-100 p-2 mt-2 bg-body-secondary"
                             />
@@ -155,3 +170,7 @@ export const EditarPerfil = () => {
         </div>
     );
 };
+
+
+// Mapea los campos con este nombre de la propiedad name ->  name="nombre"
+// onChange={e => setPerfil({ ...perfil, [e.target.name]: e.target.value })}
