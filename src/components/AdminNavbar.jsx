@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 
 export const AdminNavbar = () => {
     return (
-        <nav className="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+        <nav className="navbar navbar-expand-lg navbar-light bg-light">
             <div className="container-fluid">
 
 

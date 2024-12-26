@@ -3,6 +3,7 @@ import Swal from 'sweetalert2';
 import { createContext, useEffect, useState } from "react";
 import clienteAxios from "../../config/axios";
 import PropTypes from "prop-types";
+import useAuth from '../hooks/useAuth';
 
 
 // Mensaje de exito 
@@ -26,6 +27,8 @@ const PacientesProvider = ({ children }) => {
     const [pacientes, setPacientes] = useState([]);
     // Se crea este objeto paciente vacio para llenar o editar el formulario 
     const [pacienteObj, setPacienteObj] = useState({});
+
+    const { auth } = useAuth();
 
 
 
@@ -58,7 +61,7 @@ const PacientesProvider = ({ children }) => {
             }
         }
         obtenerPacientes();
-    }, []);
+    }, [auth]);
 
 
     //Guardar paciente

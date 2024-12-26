@@ -34,6 +34,12 @@ body{
   opacity: 1 !important;
 }
 
+.alert-success{
+  background-color: #2f8040;
+  border-color: #2f8040;
+  opacity: 1;
+}
+
 
 /* navbar  */
 .custom-navbar {

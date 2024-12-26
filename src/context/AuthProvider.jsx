@@ -33,6 +33,7 @@ const AuthProvider = ({ children }) => {
 
 
 
+
     //cuando cargue la aplicacion, verificar si el usuario esta autenticado
     useEffect(() => {
         const autenticarUsuario = async () => {
@@ -83,7 +84,6 @@ const AuthProvider = ({ children }) => {
 
         if (!token) {
             console.log('No hay token disponible');
-            setCargando(false);
             return;
         }
 
@@ -121,6 +121,42 @@ const AuthProvider = ({ children }) => {
     }
 
 
+    const guardarPassword = async (datos) => {
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            return {
+                message: 'No hay token disponible',
+                error: true
+            };
+        }
+
+        const config = {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        };
+
+        try {
+            const url = '/veterinarios/actualizar-password';
+            const { data } = await clienteAxios.put(url, datos, config);
+
+            return {
+                message: data.msg,
+                error: false
+            };
+
+        } catch (error) {
+            return {
+                message: error.response?.data?.msg || 'Error al actualizar contraseña',
+                error: true
+            };
+        }
+    };
+
+
+
     return (
         <AuthContext.Provider
 
@@ -130,7 +166,8 @@ const AuthProvider = ({ children }) => {
                 setAuth,
                 cargando,
                 cerrarSesion,
-                handleActualizarPerfil
+                handleActualizarPerfil,
+                guardarPassword
             }}
 
         >
